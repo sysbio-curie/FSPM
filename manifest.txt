@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Cytoscape-API-Compatibility: 3.0
+Cytoscape-App: fr.curie.FSPM.FSPM_App
+Cytoscape-App-Name: Fading_Signal_Propagation_Model
+Cytoscape-App-Version: 1.0
