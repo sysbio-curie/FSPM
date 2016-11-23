@@ -1,65 +1,74 @@
 package fr.curie.FSPM;
 /*
-   Fading Signal Propagation Model Cytoscape Plugin under GNU Lesser General Public License 
-   Copyright (C) 2010-2011 Institut Curie, 26 rue d'Ulm, 75005 Paris - FRANCE   
+Fading Signal Propagation Model Cytoscape Plugin under GNU Lesser General Public License 
+Copyright (C) 2015 Institut Curie, 26 rue d'Ulm, 75005 Paris - FRANCE  
 */
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.ClipboardOwner;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
+import java.awt.*;
+import java.awt.datatransfer.*;
+import java.awt.event.*;
+import javax.swing.*;
 /**
- * Not modal dialog displaying text and allowing to copy it in clipboard
- * 
- * @author Daniel.Rovera@curie.fr
+ * Text window with pop-up menu to copy and close
+ * @author Daniel.Rovera@curie.fr or @gmail.com
  */
-public class TextBox extends GridBagDialog implements ActionListener,ClipboardOwner{
+public class TextBox extends JDialog implements ClipboardOwner{
 	private static final long serialVersionUID = 1L;
-	final static int cx[]={0,0,1};
-	final static int cy[]={0,1,1};
-	final static int cw[]={2,1,1};
-	final static int ch[]={1,1,1};
-	final static int xw[]={8,1,1};
-	final static int yw[]={8,0,0} ;
-	final static int cf[]={B,H,H};
-	final int width=480;
-	final int height=320;
-	private JTextArea dtext;
-	private JButton copyButton,exitButton ;
-	public TextBox(JFrame parent,String title,String text){
-		super(parent,title,false,cx,cy,cw,ch,xw,yw,cf);
-		setSize(width,height);
-		container=getContentPane();
-		container.setLayout(new GridBagLayout());
-		constraints = new GridBagConstraints();
-		dtext=new JTextArea(text);
-		addWithConstraints(0,new JScrollPane(dtext));
-		copyButton = new JButton ("Copy whole to Clipboard");
-		addWithConstraints(1,copyButton);		
-		copyButton.addActionListener(this);
-		exitButton = new JButton ("Exit");
-		addWithConstraints(2,exitButton);
-		exitButton.addActionListener(this);
-		addWindowListener(new WindowAdapter(){public void windowClosing(WindowEvent e){dispose();}});
+	private JTextArea jtext;
+	private JPopupMenu popup;
+	final String[] items={"Copy Whole","Copy Selected","Close"};
+	public TextBox(JFrame parent,String title,double wScreen,double hScreen){
+		super(parent);
+		init(title,wScreen,hScreen);
 	}
-	public void actionPerformed (ActionEvent e){
-		if (e.getSource()==copyButton) setClipboardContents(dtext.getText());
-		if (e.getSource()==exitButton) dispose();
+	public TextBox(JFrame parent,String title,String text,double wScreen,double hScreen){
+		super();
+		init(title,wScreen,hScreen);
+		jtext.setText(text);
 	}
-	public void setClipboardContents(String aString){
-	    StringSelection stringSelection = new StringSelection(aString);
-	    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-	    clipboard.setContents(stringSelection, this);
-	  }
-	public void lostOwnership(Clipboard aClipboard, Transferable aContents) {}
+	private void init(String title,double wScreen,double hScreen){
+		setTitle(title);
+		setIconImage((new ImageIcon("D:/_java/FSPM2/FSPM_Icon.png")).getImage());
+		Dimension scr = Toolkit.getDefaultToolkit().getScreenSize();
+		setSize((int)(scr.width*wScreen),(int)(scr.height*hScreen));
+		jtext=new JTextArea();
+		add(new JScrollPane(jtext),BorderLayout.CENTER);
+		popup = new JPopupMenu();
+		ActionListener menuListener = new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				int item=0;
+				while(!items[item].equals(event.getActionCommand())) item++;
+				switch(item){
+				case 0:setClipboardContents(jtext.getText());break;
+				case 1:setClipboardContents(jtext.getSelectedText());break;
+				case 2:dispose();break;
+				}				
+			}
+		};
+	    JMenuItem item;
+	    for(int i=0;i<items.length;i++){
+	    	popup.add(item=new JMenuItem(items[i]));
+	    	item.addActionListener(menuListener);
+	    }
+	    jtext.addMouseListener(new MousePopupListener());
+	    addWindowListener(new WindowAdapter(){public void windowClosing(WindowEvent e){dispose();}});
+	}
+	class MousePopupListener extends MouseAdapter {
+		public void mousePressed(MouseEvent e){checkPopup(e);}
+		public void mouseClicked(MouseEvent e){checkPopup(e);}
+		public void mouseReleased(MouseEvent e){checkPopup(e);}
+		private void checkPopup(MouseEvent e) {if (e.isPopupTrigger()) popup.show(TextBox.this, e.getX(), e.getY());}
+	}
+	public void set(String text){
+		jtext.setText(text);
+	}
+	public void append(String text){		
+		jtext.setCaretPosition(jtext.getDocument().getLength());
+		jtext.append(text);		
+	}
+	private void setClipboardContents(String aString){
+		StringSelection stringSelection = new StringSelection(aString);
+		Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+		clipboard.setContents(stringSelection, this);
+	}
+	public void lostOwnership(Clipboard aClipboard, Transferable aContents){}
 }

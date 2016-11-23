@@ -1,7 +1,7 @@
 package fr.curie.FSPM;
 /*
    Fading Signal Propagation Model Cytoscape Plugin under GNU Lesser General Public License 
-   Copyright (C) 2010-2011 Institut Curie, 26 rue d'Ulm, 75005 Paris - FRANCE  
+   Copyright (C) 2015 Institut Curie, 26 rue d'Ulm, 75005 Paris - FRANCE  
 */
 import java.awt.Component;
 import java.awt.Container;
@@ -10,8 +10,7 @@ import java.awt.GridBagConstraints;
 import javax.swing.JDialog;
 /** 
  * Parent of dialog classes using parameters of GridBagDialog
- * 
- * @author Daniel.Rovera@curie.fr
+ * @author Daniel.Rovera@curie.fr or @gmail.com
  */
 abstract public class GridBagDialog extends JDialog{
 	private static final long serialVersionUID = 1L;

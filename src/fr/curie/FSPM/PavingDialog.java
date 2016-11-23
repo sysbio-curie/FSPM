@@ -1,10 +1,12 @@
 package fr.curie.FSPM;
-
+/*
+Fading Signal Propagation Model Cytoscape Plugin under GNU Lesser General Public License 
+Copyright (C) 2015-2016 Institut Curie, 26 rue d'Ulm, 75005 Paris - FRANCE   
+*/
 import java.awt.*;
 import javax.swing.*;
 import java.awt.datatransfer.*;
 import java.awt.event.*;
-import java.text.DecimalFormat;
 /**
  * Create a paved window where colors depend on
  * - a state defined by an array of integer,stateNotValue=true
@@ -13,8 +15,7 @@ import java.text.DecimalFormat;
  * 2 negative in blue, positive in red and zero in white, with a progressive gradation 
  * Selection of squares writes in text window data of selected squares
  * there is a geometric cooking to adjust square, the result is not always perfect
- * 
- * @author Daniel.Rovera@curie.fr
+ * @author Daniel.Rovera@curie.fr or @gmail.com
  */
 public class PavingDialog extends JFrame{
 	private static final long serialVersionUID = 1L;
@@ -119,12 +120,6 @@ public class PavingDialog extends JFrame{
 			else endX=e.getX();endY=e.getY() ;			
 			repaint() ;
 		}
-		public String strPre(double inValue){
-			DecimalFormat threeDec = new DecimalFormat("0.000");
-			String shortString = (threeDec.format(inValue));
-			return shortString;
-			}
-
 		public void mouseMoved (MouseEvent e){}
 		public void mouseReleased(MouseEvent e){
 			if(drag) drag=false; else return;			
@@ -136,8 +131,11 @@ public class PavingDialog extends JFrame{
 				for(int yi=range[2];yi<range[3]+1;yi++)for(int xi=range[0];xi<range[1]+1;xi++)
 					text=text+pd.xNames[xi]+"\t"+pd.yNames[yi]+"\t"+pd.stateNames[pd.stateArray[yi][xi]]+"\r\n";					
 			else
-				for(int yi=range[2];yi<range[3]+1;yi++)for(int xi=range[0];xi<range[1]+1;xi++)
-					text=text+pd.xNames[xi]+"\t"+pd.yNames[yi]+"\t"+pd.values[yi][xi]+"\r\n";								
+				for(int yi=range[2];yi<range[3]+1;yi++)for(int xi=range[0];xi<range[1]+1;xi++){
+					text=text+pd.xNames[xi]+"\t"+pd.yNames[yi]+"\t";
+					if(Double.isNaN(pd.values[yi][xi])) text=text+"nc";else text=text+pd.values[yi][xi];
+					text=text+"\r\n";			
+				}
 			textbox.append(text);
 		}
 		public void mouseClicked(MouseEvent v){}

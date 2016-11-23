@@ -1,17 +1,20 @@
 package fr.curie.FSPM;
+/*
+Fading Signal Propagation Model Cytoscape Plugin under GNU Lesser General Public License 
+Copyright (C) 2015-2016 Institut Curie, 26 rue d'Ulm, 75005 Paris - FRANCE   
+*/
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Stack;
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
-
 /**
  * Search the strong connected components
- * by the algorithm from Cormen, Leiserson, Rivest abd Stein
+ * by Tarjan's strongly connected components algorithm 
+ * from Cormen, Leiserson, Rivest and Stein
  * Adjacency matrix: list of edge indexes by node index
- * 
- * @author Daniel.Rovera@curie.fr
+ * @author Daniel.Rovera@curie.fr or @gmail.com
  */
 public class SCCinTable {
 	public ArrayList<CyNode> nodes;

@@ -10,7 +10,7 @@ By comparing to observations, it questions the relevance of the structure and th
 
 Few parameters are to be adjusted:
 - influence reach, number of edges beyond that the influence is neglected ;<br>
-- the round threshold to compare to measures.
+- the threshold used to compare to measures.
 
 This model is a continuation of a qualitative analysis which help one's intuition. The core functions are computing influence and comparing to observations. They are completed by inputting parameters, calibrating model and facilitating use (simulation, list paths ...). For more details, see manual.
 

@@ -21,8 +21,7 @@ import javax.swing.event.ListSelectionListener;
 /**
  * A dialog box to select strings in a list displaying selected strings
  * An arrayList is filled of selected values
- * 
- * @author Daniel.Rovera@curie.fr
+ * @author Daniel.Rovera@curie.fr or @gmail.com
  */
 public class ListDialog extends GridBagDialog implements ActionListener,ListSelectionListener{
 	private static final long serialVersionUID = 1L;

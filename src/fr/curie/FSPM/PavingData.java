@@ -1,6 +1,4 @@
 package fr.curie.FSPM;
-
-
 import java.awt.Color;
 /**
  * Data structure for Paving Dialog used too for displaying arrays
@@ -10,9 +8,8 @@ import java.awt.Color;
  * stateAbbrev: short names of states to displaying in text window
  * stateArray: array of states for discrete visualization
  * stateColors: colors used for displaying states
- * values: continue states values for continue visualization from blue to red (negative to positive)
- * 
- * @author Daniel.Rovera@curie.fr
+ * values: continue states values for continue visualization from blue to red (negative to positive) 
+ * @author Daniel.Rovera@curie.fr or @gmail.com
  */
 public class PavingData{
 	public String[] xNames;

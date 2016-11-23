@@ -1,62 +1,37 @@
 package fr.curie.FSPM;
 /*
 Fading Signal Propagation Model Cytoscape Plugin under GNU Lesser General Public License 
-Copyright (C) 2010-2013 Institut Curie, 26 rue d'Ulm, 75005 Paris - FRANCE   
+Copyright (C) 2015-2016 Institut Curie, 26 rue d'Ulm, 75005 Paris - FRANCE   
 */
+import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedList;
-
-import org.cytoscape.model.CyNetwork;
 /**
- * Classes made to be iterated through BFS trees and so
- * Select edges
- * Shortest path matrix
- * Signed distance matrix
- * Compute influence, activity and reach area
- * Use one of both path model
- * 
- * @author Daniel.Rovera@curie.fr
+ * Classes made to be iterated through trees, loops having been opened
+ * Select edges between nodes
+ * Shortest path matrix,
+ * Signed distance matrix, influence, activity and reach area
+ * @author Daniel.Rovera@curie.fr or @gmail.com
  */
-public class ComputingThroughTree extends WeightGraphStructure{
-	public ComputingThroughTree(){super();}
-	public ComputingThroughTree(CyNetwork gp){super(gp);}
+public class ComputingThroughTree extends WeightGraphTools{
+	double fade;
+	public ComputingThroughTree(WeightGraphTools wgt){
+		super(wgt);
+		fade=wgt.getFade();
+	}
 	abstract class IterThroughTree{
 		int root;
 		IterThroughTree(){}
 		void init(int root){this.root=root;}
 		void queueRemove(int node){}
 		void queueAdd(int edge){}
+		void end(){};
 	}
-	class EdgesByBFS extends IterThroughTree{
-		HashSet<Integer> edges;
-		EdgesByBFS(int setSize){
-			edges=new HashSet<Integer>(setSize);
-		}
-		void queueAdd(int edge){
-			edges.add(edge);
-		}
-	}
-	class ShortPathByBFS extends IterThroughTree{
-		int root;
-		int[][] spMx;
-		ShortPathByBFS(){
-			spMx=new int[nodes.size()][nodes.size()];
-			for(int i=0;i<nodes.size();i++) for(int j=0;j<nodes.size();j++) spMx[i][j]=Integer.MAX_VALUE; 
-		}
-		void init(int root){
-			this.root=root;
-			spMx[root][root]=0;
-		}
-		void queueAdd(int edge){
-			if(spMx[tgts.get(edge)][root]==Integer.MAX_VALUE) spMx[tgts.get(edge)][root]=spMx[srcs.get(edge)][root]+1;	
-		}
-	}
-	class SignedDistanceByITT extends IterThroughTree{
+	class SignedDistance extends IterThroughTree{
 		int depth;
 		LinkedList<Integer> levelQueue;
 		ArrayList<Integer>[][] distance;
-		public SignedDistanceByITT(){
+		public SignedDistance(){
 			levelQueue=new LinkedList<Integer>();
 			distance=new ArrayList[nodes.size()][nodes.size()];
 			for(int i=0;i<nodes.size();i++)for(int j=0;j<nodes.size();j++) distance[i][j]=(new ArrayList<Integer>());
@@ -71,7 +46,7 @@ public class ComputingThroughTree extends WeightGraphStructure{
 			depth=levelQueue.remove();
 			if(depth<0) depth--; else depth++;
 		}
-		protected void queueAdd(int edge){			
+		void queueAdd(int edge){			
 			if(weights.get(edge)<0){
 				distance[tgts.get(edge)][root].add(-depth);
 				levelQueue.add(-depth);
@@ -80,14 +55,35 @@ public class ComputingThroughTree extends WeightGraphStructure{
 				levelQueue.add(depth);
 			}
 		}
+		void end(){
+			text.append(getName(nodes.get(root)));
+			for(int t:targets){
+				text.append("\t");
+				text.append(distance[t][root].toString());
+			}
+			text.append("\r\n");
+		}	
 	}
-	class InfluenceByITT extends IterThroughTree{
-		double fade;
+	class SignedDistancList extends SignedDistance{
+		public SignedDistancList(){super();}
+		void end(){
+			for(int t:targets){
+				text.append(getName(nodes.get(root)));
+				text.append("\t");
+				text.append(getName(nodes.get(t)));
+				for(int p:distance[t][root]){
+					text.append("\t");
+					text.append(Integer.toString(p));
+				}
+				text.append("\r\n");
+			}
+		}
+	}
+	class InfluenceOnly extends IterThroughTree{
 		double value;
 		LinkedList<Double> valueQueue;
 		Double[][] influence;
-		public InfluenceByITT(double fade){
-			this.fade=fade;
+		public InfluenceOnly(){
 			valueQueue=new LinkedList<Double>();
 			influence=new Double[nodes.size()][nodes.size()];
 			for(int i=0;i<nodes.size();i++)for(int j=0;j<nodes.size();j++) influence[i][j]=Double.NaN;
@@ -101,21 +97,54 @@ public class ComputingThroughTree extends WeightGraphStructure{
 		void queueRemove(int node){
 			value=valueQueue.remove();
 		}
-		protected void queueAdd(int edge){
+		void queueAdd(int edge){
 			double newValue=fade*weights.get(edge)*value;
 			valueQueue.add(newValue);
 			if(influence[tgts.get(edge)][root].isNaN()) influence[tgts.get(edge)][root]=newValue;
 			else influence[tgts.get(edge)][root]=influence[tgts.get(edge)][root]+newValue;
 		}
 	}
+	class InfluenceComp extends InfluenceOnly{
+		public InfluenceComp(){super();}
+		void end(){
+			text.append(getName(nodes.get(root)));
+			for(int t:targets){
+				text.append("\t");
+				if(influence[t][root].isNaN()) text.append("0.0");else text.append(influence[t][root].toString());
+			}
+			text.append("\r\n");
+		}
+	}
+	class InfluenceVisu extends InfluenceOnly{
+		public InfluenceVisu(){super();}
+		void end(){
+			text.append(getName(nodes.get(root)));
+			for(int t:targets){
+				text.append("\t");
+				if(influence[t][root].isNaN()) text.append("nc");else text.append((new DecimalFormat(formatVisu)).format(influence[t][root]));
+			}
+			text.append("\r\n");
+		}
+	}
+	class InfluenceList extends InfluenceOnly{
+		public InfluenceList(){super();}
+		void end(){
+			for(int t:targets){
+				text.append(getName(nodes.get(root)));
+				text.append("\t");
+				text.append(getName(nodes.get(t)));
+				text.append("\t");
+				if(influence[t][root].isNaN()) text.append("0.0");else text.append(influence[t][root].toString());
+				text.append("\r\n");
+			}
+		}
+	}
 	class ActivityByITT extends IterThroughTree{
-		double fade;
 		double value;
 		LinkedList<Double> valueQueue;
 		double[] activIn;
 		Double[][] activity;
-		public ActivityByITT(double fade,double[] activIn){
-			this.fade=fade;
+		public ActivityByITT(double[] activIn){
 			this.activIn=activIn;
 			valueQueue=new LinkedList<Double>();
 			activity=new Double[nodes.size()][nodes.size()];
@@ -130,19 +159,17 @@ public class ComputingThroughTree extends WeightGraphStructure{
 		void queueRemove(int node){
 			value=valueQueue.remove();
 		}
-		protected void queueAdd(int edge){
+		void queueAdd(int edge){
 			double newValue=fade*weights.get(edge)*value;
 			valueQueue.add(newValue);
 			activity[tgts.get(edge)][root]=activity[tgts.get(edge)][root]+newValue;
 		}
 	}
-	class ReachAreaByITT extends IterThroughTree{
-		double fade;
+	class ReachAreaOnly extends IterThroughTree{
 		double value;
 		LinkedList<Double> valueQueue;
 		Double[][] area;
-		public ReachAreaByITT(double fade){
-			this.fade=fade;
+		public ReachAreaOnly(){
 			valueQueue=new LinkedList<Double>();
 			area=new Double[nodes.size()][nodes.size()];
 			for(int i=0;i<nodes.size();i++)for(int j=0;j<nodes.size();j++) area[i][j]=0.0;
@@ -156,10 +183,21 @@ public class ComputingThroughTree extends WeightGraphStructure{
 		void queueRemove(int node){
 			value=valueQueue.remove();
 		}
-		protected void queueAdd(int edge){
+		void queueAdd(int edge){
 			double newValue=fade*value;
 			valueQueue.add(newValue);
 			area[tgts.get(edge)][root]=area[tgts.get(edge)][root]+newValue;
+		}
+	}
+	class ReachAreaText extends ReachAreaOnly{
+		public ReachAreaText(){super();}
+		void end(){
+			text.append(getName(nodes.get(root)));
+			for(int t:targets){
+				text.append("\t");
+				if(area[t][root].isNaN()) text.append("0.0");else text.append(area[t][root].toString());
+			}
+			text.append("\r\n");
 		}
 	}
 }

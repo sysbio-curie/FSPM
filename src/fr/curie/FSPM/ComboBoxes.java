@@ -18,19 +18,18 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 /**
- * A dialog box to select values of different list of strings
- * Fields displays in comboBoxes values to be selected
- * Field index corresponds to datas index
- * datas contains lists of values
+ * A dialog box to select values from different lists of strings
+ * Field index corresponds to data index
+ * data contains lists of values
  * The result got by launch is at index 0 the selected field and
  * at index 1 to n (label size - 1) the values selected in comboBoxes
  * selected is the field selected when launching dialog
  * label ended by ':' is used as separator and title
- * Selected values are in data, in the same order than label
+ * Selected values are in datas (several array of data), in the same order than label
  * but no value when label ends by ':' 
  * Data indexes do not match with comboBox index
  * 
- * @author Daniel.Rovera@curie.fr
+ * @author Daniel.Rovera@curie.fr or @gmail.com
  */
 public class ComboBoxes extends JDialog implements ActionListener,ItemListener {
 	private static final long serialVersionUID = 1L;

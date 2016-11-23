@@ -1,7 +1,7 @@
 package fr.curie.FSPM;
 /*
 Fading Signal Propagation Model Cytoscape Plugin under GNU Lesser General Public License 
-Copyright (C) 2010-2011 Institut Curie, 26 rue d'Ulm, 75005 Paris - FRANCE  
+Copyright (C) 2015-2016 Institut Curie, 26 rue d'Ulm, 75005 Paris - FRANCE  
 */
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -22,8 +22,7 @@ import javax.swing.event.ListSelectionListener;
  * A dialog box to select strings in two lists displaying selected strings
  * 2 arrayLists are filled of selected values
  * Used to select sources and targets
- * 
- * @author Daniel.Rovera@curie.fr
+ * @author Daniel.Rovera@curie.fr  or @gmail.com
  */
 public class TwoListDialog extends GridBagDialog implements ActionListener,ListSelectionListener{
 	private static final long serialVersionUID = 1L;
