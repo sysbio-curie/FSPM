@@ -27,7 +27,6 @@ public class TextBox extends JDialog implements ClipboardOwner{
 	}
 	private void init(String title,double wScreen,double hScreen){
 		setTitle(title);
-		setIconImage((new ImageIcon("D:/_java/FSPM2/FSPM_Icon.png")).getImage());
 		Dimension scr = Toolkit.getDefaultToolkit().getScreenSize();
 		setSize((int)(scr.width*wScreen),(int)(scr.height*hScreen));
 		jtext=new JTextArea();
